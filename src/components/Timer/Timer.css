@@ -1,0 +1,51 @@
+/* Timer.css */
+
+.progress-container {
+    position: relative;
+    width: 200px; /* Match the size of the ProgressBar */
+    height: 200px; /* Match the size of the ProgressBar */
+    margin: 20px auto;
+  }
+  
+  .progress-time {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #f0f0f0;
+  }
+  
+  h1, h3 {
+    text-align: center;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 300px;
+  }
+  
+  ul li {
+    background-color: #fafafa;
+    margin: 5px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.9em;
+    text-align: left;
+  }
+  

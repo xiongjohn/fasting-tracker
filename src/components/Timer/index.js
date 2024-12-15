@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from "react";
 import ProgressBar from "../ProgressBar";
+import SetGoalButton from "../SetGoalButton";
+import "./Timer.css"; // Import the CSS file
 
 const Timer = () => {
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [isFasting, setIsFasting] = useState(false);
+  const [goalSeconds, setGoalSeconds] = useState(() => {
+    const savedGoal = localStorage.getItem("fastingGoal");
+    return savedGoal ? parseInt(savedGoal, 10) : 16 * 3600; // Default to 16 hours
+  });
   const [history, setHistory] = useState(() => {
     const savedHistory = localStorage.getItem("fastingHistory");
     return savedHistory ? JSON.parse(savedHistory) : [];
@@ -82,9 +88,7 @@ const Timer = () => {
     const hours = Math.floor(secs / 3600);
     const minutes = Math.floor((secs % 3600) / 60);
     const remainingSeconds = secs % 60;
-    return `${hours}:${minutes < 10 ? "0" : ""}${minutes}:${
-      remainingSeconds < 10 ? "0" : ""
-    }${remainingSeconds}`;
+    return `${hours}:${minutes < 10 ? "0" : ""}${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
 
   const formatDate = (dateString) => {
@@ -103,20 +107,29 @@ const Timer = () => {
   return (
     <div>
       <h1>{isFasting ? "Fasting" : "Not Fasting"}</h1>
-      <ProgressBar />
-      <h2>{formatTime(seconds)}</h2>
+      <div className="progress-container">
+        <ProgressBar
+          progress={(seconds / goalSeconds) * 100}
+          size={200}
+          strokeWidth={10}
+          type="circle"
+        />
+        <div className="progress-time">{formatTime(seconds)}</div>
+      </div>
+      <h3>Goal: {formatTime(goalSeconds)}</h3>
       {isFasting ? (
         <button onClick={stopFasting}>Stop Fasting</button>
       ) : (
         <button onClick={startFasting}>Start Fasting</button>
       )}
+      <SetGoalButton goalSeconds={goalSeconds} setGoalSeconds={setGoalSeconds} />
 
       <h3>Fasting History</h3>
       <ul>
         {history.map((entry, index) => (
           <li key={index}>
-            {formatTime(entry.duration)} - Started on:{" "}
-            {formatDate(entry.startTime)} - Ended on:{" "}
+            {formatTime(entry.duration)} - Started on: {" "}
+            {formatDate(entry.startTime)} - Ended on: {" "}
             {formatDate(entry.endTime)}
           </li>
         ))}
