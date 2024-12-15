@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ProgressBar from "../ProgressBar";
 import SetGoalButton from "../SetGoalButton";
-import "./Timer.css"; // Import the CSS file
+import "./Timer.css";
 
 const Timer = () => {
   const [seconds, setSeconds] = useState(0);
@@ -9,7 +9,7 @@ const Timer = () => {
   const [isFasting, setIsFasting] = useState(false);
   const [goalSeconds, setGoalSeconds] = useState(() => {
     const savedGoal = localStorage.getItem("fastingGoal");
-    return savedGoal ? parseInt(savedGoal, 10) : 16 * 3600; // Default to 16 hours
+    return savedGoal ? parseInt(savedGoal, 10) : 16 * 3600; // Default: 16 hours
   });
   const [history, setHistory] = useState(() => {
     const savedHistory = localStorage.getItem("fastingHistory");
@@ -17,7 +17,7 @@ const Timer = () => {
   });
 
   useEffect(() => {
-    // Load saved fasting state and start time if it exists
+    // Load saved fasting state and start time
     const savedStartTime = localStorage.getItem("fastingStartTime");
     const savedIsFasting = JSON.parse(localStorage.getItem("isFasting"));
 
@@ -29,19 +29,37 @@ const Timer = () => {
       setIsFasting(true);
       setIsRunning(true);
     }
-  }, []);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && isRunning) {
+        const elapsedTime = Math.floor(
+          (Date.now() - new Date(localStorage.getItem("fastingStartTime"))) /
+            1000
+        );
+        setSeconds(elapsedTime);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isRunning]);
 
   useEffect(() => {
     let interval = null;
 
-    if (isRunning) {
+    if (isRunning && seconds < goalSeconds) {
       interval = setInterval(() => {
         setSeconds((prevSeconds) => prevSeconds + 1);
       }, 1000);
+    } else if (seconds >= goalSeconds) {
+      setIsRunning(false); // Stop when goal is reached
     }
 
     return () => clearInterval(interval);
-  }, [isRunning]);
+  }, [isRunning, seconds, goalSeconds]);
 
   const startFasting = () => {
     const startTime = new Date().toISOString();
@@ -128,8 +146,8 @@ const Timer = () => {
       <ul>
         {history.map((entry, index) => (
           <li key={index}>
-            {formatTime(entry.duration)} - Started on: {" "}
-            {formatDate(entry.startTime)} - Ended on: {" "}
+            {formatTime(entry.duration)} - Started on:{" "}
+            {formatDate(entry.startTime)} - Ended on:{" "}
             {formatDate(entry.endTime)}
           </li>
         ))}
