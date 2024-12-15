@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ProgressBar from "../ProgressBar";
 
 const Timer = () => {
   const [seconds, setSeconds] = useState(0);
@@ -102,6 +103,7 @@ const Timer = () => {
   return (
     <div>
       <h1>{isFasting ? "Fasting" : "Not Fasting"}</h1>
+      <ProgressBar />
       <h2>{formatTime(seconds)}</h2>
       {isFasting ? (
         <button onClick={stopFasting}>Stop Fasting</button>
