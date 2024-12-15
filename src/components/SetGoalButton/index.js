@@ -25,9 +25,9 @@ const SetGoalButton = ({ goalSeconds, setGoalSeconds }) => {
                     min="1" 
                     />
             </lable>
-            <button onClick={handlesave}>Save Goal</button>
+            <button onClick={handleSave}>Save Goal</button>
         </div>
     )
 }
 
-export default Goals
+export default SetGoalButton
