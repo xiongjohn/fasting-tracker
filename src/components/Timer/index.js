@@ -9,7 +9,7 @@ const Timer = () => {
   const [isFasting, setIsFasting] = useState(false);
   const [goalSeconds, setGoalSeconds] = useState(() => {
     const savedGoal = localStorage.getItem("fastingGoal");
-    return savedGoal ? parseInt(savedGoal, 10) : 16 * 3600; // Default: 16 hours
+    return savedGoal ? parseInt(savedGoal, 10) : 16 * 3600; // Default to 16 hours
   });
   const [history, setHistory] = useState(() => {
     const savedHistory = localStorage.getItem("fastingHistory");
@@ -29,37 +29,19 @@ const Timer = () => {
       setIsFasting(true);
       setIsRunning(true);
     }
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible" && isRunning) {
-        const elapsedTime = Math.floor(
-          (Date.now() - new Date(localStorage.getItem("fastingStartTime"))) /
-            1000
-        );
-        setSeconds(elapsedTime);
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [isRunning]);
+  }, []);
 
   useEffect(() => {
     let interval = null;
 
-    if (isRunning && seconds < goalSeconds) {
+    if (isRunning) {
       interval = setInterval(() => {
         setSeconds((prevSeconds) => prevSeconds + 1);
       }, 1000);
-    } else if (seconds >= goalSeconds) {
-      setIsRunning(false); // Stop when goal is reached
     }
 
     return () => clearInterval(interval);
-  }, [isRunning, seconds, goalSeconds]);
+  }, [isRunning]);
 
   const startFasting = () => {
     const startTime = new Date().toISOString();
@@ -106,7 +88,9 @@ const Timer = () => {
     const hours = Math.floor(secs / 3600);
     const minutes = Math.floor((secs % 3600) / 60);
     const remainingSeconds = secs % 60;
-    return `${hours}:${minutes < 10 ? "0" : ""}${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
+    return `${hours}:${minutes < 10 ? "0" : ""}${minutes}:${
+      remainingSeconds < 10 ? "0" : ""
+    }${remainingSeconds}`;
   };
 
   const formatDate = (dateString) => {
@@ -127,7 +111,7 @@ const Timer = () => {
       <h1>{isFasting ? "Fasting" : "Not Fasting"}</h1>
       <div className="progress-container">
         <ProgressBar
-          progress={(seconds / goalSeconds) * 100}
+          progress={Math.min((seconds / goalSeconds) * 100, 100)} // Cap progress at 100%
           size={200}
           strokeWidth={10}
           type="circle"
